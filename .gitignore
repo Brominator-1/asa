@@ -41,3 +41,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+#Google API Key
+android/app/src/main/res/values/styles.xml
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+.env
