@@ -203,15 +203,41 @@ class _MaintenanceCalendarState extends State<MaintenanceCalendar> {
                 color: Colors.orange,
                 shape: BoxShape.circle,
               ),
+              markerDecoration: BoxDecoration(
+                color: Colors.redAccent,
+                shape: BoxShape.circle,
+              ),
+              markersMaxCount: 1,
             ),
           ),
           const SizedBox(height: 8.0),
           Expanded(
-            child: ListView(
-              children: _events[_selectedDay]?.map((event) => ListTile(
-                title: Text(event),
-              )).toList() ?? [
-                const ListTile(title: Text('Немає записів')),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Події на ${DateFormat('dd.MM.yyyy').format(_selectedDay)}:',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                ...(_events[_selectedDay]?.map((event) => ListTile(title: Text(event))) ?? [
+                  const ListTile(title: Text('Немає записів')),
+                ]),
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Найближчі записи:',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    children: _getUpcomingEvents(),
+                  ),
+                ),
               ],
             ),
           ),
@@ -223,4 +249,23 @@ class _MaintenanceCalendarState extends State<MaintenanceCalendar> {
       ),
     );
   }
+
+  List<Widget> _getUpcomingEvents() {
+    final now = DateTime.now();
+    final upcoming = _events.entries
+        .where((entry) => entry.key.isAfter(now))
+        .toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    return upcoming.take(5).expand((entry) {
+      return entry.value.map((event) {
+        return ListTile(
+          leading: Icon(Icons.event),
+          title: Text(event),
+          subtitle: Text(DateFormat('dd.MM.yyyy').format(entry.key)),
+        );
+      });
+    }).toList();
+  }
+
 }
